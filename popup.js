@@ -19,7 +19,7 @@ async function setPageBackgroundColor() {
     });
 
     let sessionEntries = Object.entries(sessionStorage)
-    let groupName = document.getElementById('groupNames');
+    let groupNames = document.getElementById("groupNames");
 
     sessionEntries.forEach(entry => {
         let parsed = JSON.parse(entry[1]);
@@ -27,6 +27,8 @@ async function setPageBackgroundColor() {
 
         let title = result?.[0]?.[0];
         let values = result?.[0]?.[1];
+
+        groupNames[groupNames?.options?.length ?? 0] = new Option(title, values);
         console.log("title", title);
         // groupName.options = title;
         console.log("values", values);
