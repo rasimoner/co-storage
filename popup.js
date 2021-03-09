@@ -22,22 +22,29 @@ async function setPageBackgroundColor() {
     let groupNames = document.getElementById("groupNames");
 
     sessionEntries.forEach(entry => {
-        let parsed = JSON.parse(entry[1]);
-        let result = Object.keys(parsed).map((key) => [String(key), parsed[key]]);
+        let parsed = "";
+        if(entry[1].includes('{')) parsed = JSON.parse(entry[1]);
+        if(!parsed) return;
+
+        let result = Object.keys(parsed)?.map((key) => [String(key), parsed[key]]);
 
         let title = result?.[0]?.[0];
         let values = result?.[0]?.[1];
 
-        groupNames[groupNames?.options?.length ?? 0] = new Option(title, values);
+        // groupNames[groupNames?.options?.length ?? 0] = new Option(title, values);
         console.log("title", title);
         // groupName.options = title;
         console.log("values", values);
 
     });
-    let test = 'ConfigurationService_getConfigurations__["SharedConfigurations"]';
-    let gettingItem = sessionStorage.getItem(test)
+    
+    let configGroupName = 'SharedConfigurations'; // group names lookuptan gelen grup başlık adı
+    let configItemName = `ConfigurationService_getConfigurations__[${configGroupName}]`;
+    let gettingItem = sessionStorage.getItem(configItemName);
 
-    sessionStorage.setItem(test, '{"sharedConfigurations":{"additionalValueMustDiagnosticCodes":["07.02.1","20.01","21.01"],"allowExaminationDocumentSelectionOnEpicrisisCreate":false,"departmentAuthorityCode":"Yetki.Veri.Bolum","enableESignerDBLogging":true,"enableIncludeToEpicrisisUnsignedForms":false,"enablePrintButtonForForms":true,"featuredMonitoringFormCodes":["U07.3"],"floorAuthorityCode":"Yetki.Veri.Kat","generalPhysicalExaminationRequired":true,"isEnableAddingLabOrderDespiteOfRepeatedOnUss":false,"isEnableAddingRadOrderDespiteOfRepeatedOnTeletip":true,"key":"SharedConfigurations","prescriptionPermission":15,"pusulaWebAPIAnonymousUsername":"comed.doktor","reviewOfSystemGeneralRequired":false,"stockWarehouseAuthorityCode":"Yetki.Veri.Depo","temporaryTransferPropertyType":"HASTATRANSFER_Testssss"}}');
+    console.log("gettingItem", gettingItem);
+
+    sessionStorage.setItem(configItemName, '{"sharedConfigurations":{"additionalValueMustDiagnosticCodes":["07.02.1","20.01","21.01"],"allowExaminationDocumentSelectionOnEpicrisisCreate":false,"departmentAuthorityCode":"Yetki.Veri.Bolum","enableESignerDBLogging":true,"enableIncludeToEpicrisisUnsignedForms":false,"enablePrintButtonForForms":true,"featuredMonitoringFormCodes":["U07.3"],"floorAuthorityCode":"Yetki.Veri.Kat","generalPhysicalExaminationRequired":true,"isEnableAddingLabOrderDespiteOfRepeatedOnUss":false,"isEnableAddingRadOrderDespiteOfRepeatedOnTeletip":true,"key":"SharedConfigurations","prescriptionPermission":15,"pusulaWebAPIAnonymousUsername":"comed.doktor","reviewOfSystemGeneralRequired":false,"stockWarehouseAuthorityCode":"Yetki.Veri.Depo","temporaryTransferPropertyType":"HASTATRANSFER_Testssss"}}');
 }
 
 function myFunction() {
