@@ -1,48 +1,15 @@
 let changeColor = document.getElementById("changeColor");
-
 const extensionDocument = document;
 
 chrome.storage.sync.get("color", ({ color }) => {
     changeColor.style.backgroundColor = color;
 });
 
-
 function setPageBackgroundColor(){
     chrome.storage.sync.get("color", ({ color }) => {
         document.body.style.backgroundColor = color;
     });
-
-    console.log('reads',sessionStorage)
-
     return Object.entries(sessionStorage);
-
-    console.log({ document })
-    let groupNames = extensionDocument.getElementById("group-names");
-
-    let changeColor2 = extensionDocument.getElementById("changeColor");
-
-    console.log("groupNames", groupNames)
-    console.log("changeColor2", changeColor2)
-
-    sessionEntries.forEach(entry => {
-        let parsed = "";
-        if (entry[1].includes('{')) parsed = JSON.parse(entry[1]);
-        if (!parsed) return;
-
-        let result = Object.keys(parsed)?.map((key) => [String(key), parsed[key]]);
-
-        let title = result?.[0]?.[0];
-        let values = result?.[0]?.[1];
-
-
-    });
-
-    let configGroupName = 'SharedConfigurations'; // group names lookuptan gelen grup başlık adı
-    let configItemName = `ConfigurationService_getConfigurations__[${configGroupName}]`;
-    let gettingItem = sessionStorage.getItem(configItemName);
-
-
-    sessionStorage.setItem(configItemName, '{"sharedConfigurations":{"additionalValueMustDiagnosticCodes":["07.02.1","20.01","21.01"],"allowExaminationDocumentSelectionOnEpicrisisCreate":false,"departmentAuthorityCode":"Yetki.Veri.Bolum","enableESignerDBLogging":true,"enableIncludeToEpicrisisUnsignedForms":false,"enablePrintButtonForForms":true,"featuredMonitoringFormCodes":["U07.3"],"floorAuthorityCode":"Yetki.Veri.Kat","generalPhysicalExaminationRequired":true,"isEnableAddingLabOrderDespiteOfRepeatedOnUss":false,"isEnableAddingRadOrderDespiteOfRepeatedOnTeletip":true,"key":"SharedConfigurations","prescriptionPermission":15,"pusulaWebAPIAnonymousUsername":"comed.doktor","reviewOfSystemGeneralRequired":false,"stockWarehouseAuthorityCode":"Yetki.Veri.Depo","temporaryTransferPropertyType":"HASTATRANSFER_Testssss"}}');
 }
 
 changeColor.addEventListener("click", async () => {
@@ -53,16 +20,53 @@ changeColor.addEventListener("click", async () => {
         function: setPageBackgroundColor
         
     },(res) => {
-        const storage = res?.[0]?.result;
-
-        console.log('res',storage);
-
+        const sessionEntries = res?.[0]?.result;
         let groupNames = extensionDocument.getElementById("group-names");
+        let parameterNames = extensionDocument.getElementById("parameter-names");
 
-        let changeColor2 = extensionDocument.getElementById("changeColor");
+        sessionEntries.forEach(entry => {
+            let parsed = "";
+            if (entry[1].includes('{')) parsed = JSON.parse(entry[1]);
+            if (!parsed) return;
 
-        console.log("groupNames", groupNames)
-        console.log("changeColor2", changeColor2)
+            let result = Object.keys(parsed)?.map((key) => [String(key), parsed[key]]);
+
+            let title = result?.[0]?.[0];
+            let values = result?.[0]?.[1];
+
+            if (title) {
+                let optionElement = document.createElement("option");
+                optionElement.setAttribute(title, title);
+                let textNode = document.createTextNode(title);
+                if (!optionElement.contains(textNode)) optionElement.appendChild(textNode);
+                if (!groupNames.contains(optionElement)) groupNames.appendChild(optionElement);
+            }
+
+            for (const [key, value] of Object.entries(values)) {
+                console.log(`${key}: ${value}`);
+                let optionElement = document.createElement("option");
+                optionElement.setAttribute(key, key);
+                let textNode = document.createTextNode(key);
+                console.log("test", optionElement.attributes.getNamedItem(key).value)
+
+                    // let isExist = parameterNames.childNodes[0].isSameNode()?.some(x=>x.attributes?.getNamedItem(key).value == key);
+                    // if (!isExist) {
+                        optionElement.appendChild(textNode);
+                        parameterNames.appendChild(optionElement);
+                    // }
+            }
+
+            console.log("title", title)
+            console.log("values", values)
+
+            let configGroupName = 'SharedConfigurations'; // group names lookuptan gelen grup başlık adı
+            let configItemName = `ConfigurationService_getConfigurations__[${configGroupName}]`;
+            let gettingItem = sessionStorage.getItem(configItemName);
+
+
+            sessionStorage.setItem(configItemName, '{"sharedConfigurations":{"additionalValueMustDiagnosticCodes":["07.02.1","20.01","21.01"],"allowExaminationDocumentSelectionOnEpicrisisCreate":false,"departmentAuthorityCode":"Yetki.Veri.Bolum","enableESignerDBLogging":true,"enableIncludeToEpicrisisUnsignedForms":false,"enablePrintButtonForForms":true,"featuredMonitoringFormCodes":["U07.3"],"floorAuthorityCode":"Yetki.Veri.Kat","generalPhysicalExaminationRequired":true,"isEnableAddingLabOrderDespiteOfRepeatedOnUss":false,"isEnableAddingRadOrderDespiteOfRepeatedOnTeletip":true,"key":"SharedConfigurations","prescriptionPermission":15,"pusulaWebAPIAnonymousUsername":"comed.doktor","reviewOfSystemGeneralRequired":false,"stockWarehouseAuthorityCode":"Yetki.Veri.Depo","temporaryTransferPropertyType":"HASTATRANSFER_Testssss"}}');
+
+        });
     });
 });
 
