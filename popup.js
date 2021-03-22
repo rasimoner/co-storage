@@ -1,16 +1,34 @@
 let changeColor = document.getElementById("changeColor");
 const extensionDocument = document;
+let groupNames = extensionDocument.getElementById("group-names");
+let parameterNames = extensionDocument.getElementById("parameter-names");
 
 chrome.storage.sync.get("color", ({ color }) => {
     changeColor.style.backgroundColor = color;
 });
 
 function setPageBackgroundColor(){
-    chrome.storage.sync.get("color", ({ color }) => {
-        document.body.style.backgroundColor = color;
-    });
+    // chrome.storage.sync.get("color", ({ color }) => {
+    //     document.body.style.backgroundColor = color;
+    // });
     return Object.entries(sessionStorage);
 }
+
+function changeSelectedParameter(){}
+
+parameterNames.addEventListener("change", async () => {
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: changeSelectedParameter
+    },() => {
+        let selectedValue = extensionDocument.getElementById("selected-value");
+        let parameterNames = extensionDocument.getElementById("parameter-names");
+
+        selectedValue.value = parameterNames?.selectedOptions?.[0]?.attributes?.[0]?.value ?? "";
+    })
+})
 
 changeColor.addEventListener("click", async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -21,8 +39,6 @@ changeColor.addEventListener("click", async () => {
         
     },(res) => {
         const sessionEntries = res?.[0]?.result;
-        let groupNames = extensionDocument.getElementById("group-names");
-        let parameterNames = extensionDocument.getElementById("parameter-names");
 
         sessionEntries.forEach(entry => {
             let parsed = "";
@@ -43,11 +59,12 @@ changeColor.addEventListener("click", async () => {
             }
 
             for (const [key, value] of Object.entries(values)) {
-                console.log(`${key}: ${value}`);
                 let optionElement = document.createElement("option");
-                optionElement.setAttribute(key, key);
+                optionElement.setAttribute(key, `${value}`);
                 let textNode = document.createTextNode(key);
-                console.log("test", optionElement.attributes.getNamedItem(key).value)
+                // console.log("test", optionElement.attributes.getNamedItem(key).value);
+                // if (parameterNames.options.length)
+                //     console.log("test2", parameterNames.options.some(x=>x?.attributes?.getNamedItem(key)))
 
                     // let isExist = parameterNames.childNodes[0].isSameNode()?.some(x=>x.attributes?.getNamedItem(key).value == key);
                     // if (!isExist) {
@@ -55,9 +72,6 @@ changeColor.addEventListener("click", async () => {
                         parameterNames.appendChild(optionElement);
                     // }
             }
-
-            console.log("title", title)
-            console.log("values", values)
 
             let configGroupName = 'SharedConfigurations'; // group names lookuptan gelen grup başlık adı
             let configItemName = `ConfigurationService_getConfigurations__[${configGroupName}]`;
@@ -75,38 +89,8 @@ changeColor.addEventListener("click", async () => {
             let test10 = '{"transfusionConfigurations":{"enableOrderTransfusionForm":true,"erythrocyteSuspensionKCode":"2","key":"TransfusionConfigurations"}}';
             let test11 = '{"prmConfigurations":{"allPRMTaskTypes":[80,83,81,84,82,85,86],"appointmentResourceBlockMinute":10,"defaultAppointmentClosingTaskPool":"PRM","defaultAppointmentRemindingTaskMarginHours":24,"defaultAppointmentRemindingTaskPool":"PRM","defaultPatientContactCancellationTaskPool":"PRM-PatientContactCancellation","defaultPatientGuidanceTaskPool":"PRM","defaultPatientTrackingTaskPool":"PRM","defaultPreAppointmentTaskPool":"PRM","doctorMounthlyPlanClosingQuota":5000,"isMernisCheckAllowed":true,"key":"PRMConfigurations","patientValidationSMSCodeValidityMinute":3,"requiredPatientFields":["firstName","lastName","gender","identityNumber","passportNumber","type"],"resourcePlanMinuteInterval":10,"taskCreationDueDateMarginHours":1,"useTenantPatientIdForTrackingsAndGuidances":false}}';
 
-            sessionStorage.setItem(configItemName, test1);
+            sessionStorage.setItem(configItemName, test01);
 
         });
     });
 });
-
-
-function myFunction() {
-    let sessionEntries = Object.entries(sessionStorage);
-
-    var x = document.createElement("SELECT");
-    x.setAttribute("id", "mySelect");
-    document.body.appendChild(x);
-
-    sessionEntries.forEach(entry => {
-        let parsed = JSON.parse(entry[1]);
-        let result = Object.keys(parsed).map((key) => [String(key), parsed[key]]);
-
-        let title = result?.[0]?.[0];
-        let values = result?.[0]?.[1];
-
-        for (let item in values) {
-            var z = document.createElement("option");
-            z.setAttribute(values[item], values[item]);
-            var t = document.createTextNode(values[item]);
-            z.appendChild(t);
-            document.getElementById("mySelect").appendChild(z);
-        }
-
-        console.log("title", title);
-        // groupName?.options = title;
-        console.log("values", values);
-
-    });
-}
